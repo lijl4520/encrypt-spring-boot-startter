@@ -54,7 +54,7 @@ public class DecryptRequest extends RequestBodyAdviceAdapter {
             final ByteArrayInputStream bais = new ByteArrayInputStream(decrypt);
             return new HttpInputMessage() {
                 @Override
-                public InputStream getBody() throws IOException {
+                public InputStream getBody() {
                     return bais;
                 }
 

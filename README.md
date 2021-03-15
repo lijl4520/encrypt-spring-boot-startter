@@ -9,10 +9,10 @@ SpringBoot中的starter是一种非常重要的机制，能够抛弃以前繁杂
 - 接口加解密
 - 日志记录
 
-##自定义Starter的命名规则
+## 自定义Starter的命名规则
 SpringBoot官方提供的Starter以spring-boot-starter-xxx的方式命名的。官方建议自定义的Starter使用xxx-spring-boot-starter命名规则，以区分SpringBoot生态提供的Starter。
 
-#自定义Starter的实现方法
+# 自定义Starter的实现方法
 ....
 ## 引入相关依赖
 ```

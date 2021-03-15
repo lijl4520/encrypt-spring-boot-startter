@@ -13,7 +13,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class EncryptProperties {
 
     private final static String DEFAULT_KEY = "123456789123456";
+    private final static String DEFAULT_TYPE = "AES";
     private String key = DEFAULT_KEY;
+    private String type = DEFAULT_TYPE;
 
     public String getKey(){
         return key;
@@ -21,5 +23,13 @@ public class EncryptProperties {
 
     public void setKey(String key){
         this.key = key;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

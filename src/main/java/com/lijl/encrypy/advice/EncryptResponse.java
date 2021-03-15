@@ -6,6 +6,7 @@ import com.lijl.encrypy.annotation.Encrpty;
 import com.lijl.encrypy.config.EncryptProperties;
 import com.lijl.encrypy.model.RespBean;
 import com.lijl.encrypy.utils.AESUtils;
+import com.lijl.encrypy.utils.DesEncryptUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.MethodParameter;
@@ -50,22 +51,17 @@ public class EncryptResponse implements ResponseBodyAdvice<RespBean> {
     @Override
     public RespBean beforeBodyWrite(RespBean respBean, MethodParameter methodParameter, MediaType mediaType, Class<? extends HttpMessageConverter<?>> aClass, ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse) {
         byte[] keyBytes = encryptProperties.getKey().getBytes();
+        String type = encryptProperties.getType();
         try {
             if (respBean.getObj()!=null){
-                respBean.setObj(AESUtils.encrypy(om.writeValueAsBytes(respBean.getObj()),keyBytes));
+                if ("AES".equals(type)){
+                    respBean.setObj(AESUtils.encrypy(om.writeValueAsBytes(respBean.getObj()),keyBytes));
+                }else if ("DES".equals(type)){
+                    respBean.setObj(DesEncryptUtil.encrypt(om.writeValueAsBytes(respBean.getObj()),encryptProperties.getKey()));
+                }
             }
             return respBean;
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         respBean.setStatus(500);

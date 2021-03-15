@@ -3,6 +3,7 @@ package com.lijl.encrypy.adapter;
 import com.lijl.encrypy.annotation.Decrpty;
 import com.lijl.encrypy.config.EncryptProperties;
 import com.lijl.encrypy.utils.AESUtils;
+import com.lijl.encrypy.utils.DesEncryptUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.MethodParameter;
@@ -12,15 +13,10 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdviceAdapter;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * @Author Lijl
@@ -47,31 +43,33 @@ public class DecryptRequest extends RequestBodyAdviceAdapter {
 
     @Override
     public HttpInputMessage beforeBodyRead(final HttpInputMessage inputMessage, MethodParameter parameter, Type targetType, Class<? extends HttpMessageConverter<?>> converterType) throws IOException {
+        String type = encryptProperties.getType();
         byte[] body = new byte[inputMessage.getBody().available()];
         inputMessage.getBody().read(body);
-        try {
-            byte[] decrypt = AESUtils.decrypt(body,encryptProperties.getKey().getBytes());
-            final ByteArrayInputStream bais = new ByteArrayInputStream(decrypt);
-            return new HttpInputMessage() {
-                @Override
-                public InputStream getBody() {
-                    return bais;
-                }
 
-                @Override
-                public HttpHeaders getHeaders() {
-                    return inputMessage.getHeaders();
-                }
-            };
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
+        try {
+            byte[] decrypt = new byte[0];
+            if ("AES".equals(type)){
+                decrypt = AESUtils.decrypt(body,encryptProperties.getKey().getBytes());
+            }else if ("DES".equals(type)){
+                String bodyStr = new String(body);
+                decrypt = DesEncryptUtil.decrypt(encryptProperties.getKey(),bodyStr);
+            }
+            if (decrypt!=null && decrypt.length>0){
+                final ByteArrayInputStream bais = new ByteArrayInputStream(decrypt);
+                return new HttpInputMessage() {
+                    @Override
+                    public InputStream getBody() {
+                        return bais;
+                    }
+
+                    @Override
+                    public HttpHeaders getHeaders() {
+                        return inputMessage.getHeaders();
+                    }
+                };
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return super.beforeBodyRead(inputMessage, parameter, targetType, converterType);

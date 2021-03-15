@@ -21,24 +21,18 @@ import java.security.spec.InvalidKeySpecException;
  * @Version 1.0
  */
 public class DesEncryptUtil {
-    public static final String DES_KEY="@Wx^t)V#";
 
-    public static SecureRandom getSecureRandom(){
-        // DES算法要求有一个可信任的随机数源
-        return new SecureRandom();
-    }
+    private static SecureRandom sr;
+    private static SecretKey securekey;
 
-    public static SecretKey getSecurekey(String key) throws InvalidKeyException, NoSuchAlgorithmException, InvalidKeySpecException {
+    public static Cipher getCipher(String key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidKeySpecException {
+        sr = new SecureRandom();
         // 从原始密匙数据创建一个DESKeySpec对象
         DESKeySpec dks = new DESKeySpec(key.getBytes());
         // 创建一个密匙工厂，然后用它把DESKeySpec对象转换成
         // 一个SecretKey对象
         SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
-        SecretKey securekey = keyFactory.generateSecret(dks);
-        return securekey;
-    }
-
-    public static Cipher getCipher() throws NoSuchAlgorithmException, NoSuchPaddingException {
+        securekey = keyFactory.generateSecret(dks);
         // Cipher对象实际完成解密操作
         Cipher cipher = Cipher.getInstance("DES");
         return cipher;
@@ -54,9 +48,7 @@ public class DesEncryptUtil {
      * @return: byte[]
      **/
     public static byte[] decrypt(String key, String src) throws Exception {
-        SecureRandom sr = getSecureRandom();
-        SecretKey securekey = getSecurekey(key);
-        Cipher cipher = getCipher();
+        Cipher cipher = getCipher(key);
         // 用密匙初始化Cipher对象
         cipher.init(Cipher.DECRYPT_MODE, securekey, sr);
         // 现在，获取数据并解密
@@ -75,9 +67,7 @@ public class DesEncryptUtil {
      * @return: byte[]
      **/
     public static String encrypt(byte[] src,String key) throws Exception {
-        SecureRandom sr = getSecureRandom();
-        SecretKey securekey = getSecurekey(key);
-        Cipher cipher = getCipher();
+        Cipher cipher = getCipher(key);
         // 用密匙初始化Cipher对象
         cipher.init(Cipher.ENCRYPT_MODE, securekey, sr);
         // 现在，获取数据并加密

@@ -1,6 +1,5 @@
 package com.lijl.encrypy.advice;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lijl.encrypy.annotation.Encrpty;
 import com.lijl.encrypy.config.EncryptProperties;
@@ -17,11 +16,6 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * @Author Lijl
@@ -34,7 +28,7 @@ import java.security.NoSuchAlgorithmException;
 @ControllerAdvice
 public class EncryptResponse implements ResponseBodyAdvice<RespBean> {
 
-    private ObjectMapper om = new ObjectMapper();
+    private final ObjectMapper om = new ObjectMapper();
 
     EncryptProperties encryptProperties;
 
